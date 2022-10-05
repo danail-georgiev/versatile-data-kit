@@ -65,9 +65,7 @@ control_service_integration_test:
   extends: .control_service_base_build
   stage: build
   variables:
-    DEPLOYMENT_K8S_KUBECONFIG: "~/.kube/config"
     DEPLOYMENT_K8S_NAMESPACE: $CICD_KUBERNETES_NAMESPACE
-    CONTROL_K8S_KUBECONFIG: "~/.kube/config"
     CONTROL_K8S_NAMESPACE: $CICD_KUBERNETES_NAMESPACE
     DOCKER_REGISTRY_URL: $CICD_CONTAINER_REGISTRY_URI
     DOCKER_REGISTRY_USERNAME: $CICD_CONTAINER_REGISTRY_USER_NAME
@@ -80,8 +78,6 @@ control_service_integration_test:
   script:
     - cd projects/control-service/projects
     - ./gradlew -p ./model build publishToMavenLocal
-    - mkdir -p ~/.kube
-    - cp $KUBECONFIG ~/.kube/config
     - ./gradlew -v
     - ./gradlew projects --info
     - ./gradlew -Djdk.tls.client.protocols=TLSv1.2 :pipelines_control_service:integrationTest --info --stacktrace
