@@ -361,15 +361,15 @@ class JobController:
             )
             execution_list = json.loads(response)
 
-            if execution_list:
-                job_execution_running = False
-                for execution in execution_list:
-                    if str(execution["status"]) == "running":
-                        job_execution_running = True
-                        log.info(
-                            f"Data job execution is in state {execution['status']}. Will wait 10 seconds and check again."
-                        )
-                        break
+            job_execution_running = False
+            for execution in execution_list:
+                if str(execution["status"]) == "running":
+                    job_execution_running = True
+                    log.info(
+                        f"Data job execution is in state {execution['status']}. Will wait 10 seconds and check again."
+                    )
+                    break
+
             time.sleep(10)
         log.info(f"Data job is running : {job_execution_running}")
         assert not job_execution_running, (
