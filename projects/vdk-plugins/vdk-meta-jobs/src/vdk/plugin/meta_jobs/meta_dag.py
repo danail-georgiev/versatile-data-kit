@@ -12,6 +12,9 @@ from typing import Dict
 from typing import List
 
 from taurus_datajob_api import ApiException
+from vdk.internal.core.errors import ErrorMessage
+from vdk.internal.core.errors import UserCodeError
+
 from vdk.plugin.meta_jobs.cached_data_job_executor import TrackingDataJobExecutor
 from vdk.plugin.meta_jobs.meta import TrackableJob
 from vdk.plugin.meta_jobs.meta_configuration import MetaPluginConfiguration
@@ -44,6 +47,7 @@ class MetaJobsDag:
     def build_dag(self, jobs: List[Dict]):
         for job in jobs:
             # TODO: add some job validation here; check the job exists, its previous jobs exists, etc
+            self._validate_job(job)
             trackable_job = TrackableJob(
                 job["job_name"],
                 job.get("team_name", self._team_name),
@@ -134,3 +138,61 @@ class MetaJobsDag:
                 self._delayed_starting_jobs.enqueue(node)
             else:
                 raise
+
+    def _validate_job(self, job: Dict):
+        allowed_job_keys = ["job_name", "team_name", "fail_meta_job_on_error", "depends_on"]
+        if all(key in allowed_job_keys for key in job.keys()):
+            if all(pred in self._job_executor.get_all_jobs() for pred in job["depends_on"]):
+                if type(job["fail_meta_job_on_error"]) == bool:
+                    if job["job_name"] not in self._job_executor.get_all_jobs():
+                        log.info(f"Successfully validated job: {job['job_name']}")
+                        # TODO maybe check for team_name
+                    else:
+                        raise UserCodeError(
+                            ErrorMessage(
+                                "",
+                                "Meta Job failed due to a data job validation failure.",
+                                f"Validation of Data Job {job['job_name']} failed. "
+                                f"Job with such name already exists.",
+                                "The DAG will not be built and the meta data job will fail.",
+                                "Check the Data Job Dict value of job_name.",
+                            )
+                        )
+                else:
+                    raise UserCodeError(
+                        ErrorMessage(
+                            "",
+                            "Meta Job failed due to a data job validation failure.",
+                            f"Validation of Data Job {job['job_name']} failed. "
+                            f"There is an error with the type of {job['fail_meta_job_on_error']}",
+                            "The DAG will not be built and the meta data job will fail.",
+                            "Check the Data Job Dict value of fail_meta_job_on_error. Expected type is bool.",
+                        )
+                    )
+            else:
+                raise UserCodeError(
+                    ErrorMessage(
+                        "",
+                        "Meta Job failed due to a data job validation failure.",
+                        f"Validation of Data Job {job['job_name']} failed. "
+                        f"There is an error with the dependencies {job['depends_on']}",
+                        "The DAG will not be built and the meta data job will fail.",
+                        "Check the Data Job Dict dependencies.",
+                    )
+                )
+        else:
+            raise UserCodeError(
+                ErrorMessage(
+                    "",
+                    "Meta Job failed due to a data job validation failure.",
+                    f"Validation of Data Job {job['job_name']} failed. "
+                    "One or more keys in the Data Job Dict are not allowed.",
+                    "The DAG will not be built and the meta data job will fail.",
+                    "Check the Data Job Dict for typo errors.",
+                )
+            )
+        # The configuration list is properly validated before being built into a dag for :
+        #  * job name/team name exists in the Control Service
+        #  * dag structure (spelling mistakes for example)
+        # list of DICTS - check if the fields of each dict are the expected ones
+
