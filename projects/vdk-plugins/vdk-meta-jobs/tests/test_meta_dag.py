@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 from vdk.plugin.meta_jobs.cached_data_job_executor import TrackingDataJobExecutor
 from vdk.plugin.meta_jobs.meta_dag import MetaJobsDag
 
+
 # We overall eschew unit tests in favor of functional tests in test_meta_job
 # Still some functionalities are more easily tested in unit tests so we add here some.
 
@@ -47,11 +48,11 @@ def test_execute_dag_happy_case():
     dag.execute_dag()
 
     assert [
-        call("job1"),
-        call("job2"),
-        call("job3"),
-        call("job4"),
-    ] == dag._job_executor.start_job.call_args_list
+               call("job1"),
+               call("job2"),
+               call("job3"),
+               call("job4"),
+           ] == dag._job_executor.start_job.call_args_list
 
 
 def test_execute_dag_busyloop():
@@ -84,3 +85,133 @@ def test_execute_dag_busyloop():
 
     # check for busyloop (this would have been called hundreds of times if there is busyloop bug)
     assert calls[0] <= 4
+
+
+def test_execute_dag_depends_on_itself():
+    job1 = dict(job_name="job1", depends_on=["job1"])
+    job2 = dict(job_name="job2", depends_on=["job1"])
+    job3 = dict(job_name="job3", depends_on=["job1"])
+    job4 = dict(job_name="job4", depends_on=["job2", "job3"])
+    jobs = [job1, job2, job3, job4]
+
+    dag = MetaJobsDag("team", DummyMetaPluginConfiguration())
+    dag.build_dag(jobs)
+    dag._job_executor = MagicMock(spec=TrackingDataJobExecutor)
+    dag._job_executor.get_finished_job_names.side_effect = [
+        ["job1"],
+        ["job2", "job3"],
+        ["job4"],
+    ]
+
+    dag.execute_dag()
+
+    assert [
+               call("job1"),
+               call("job2"),
+               call("job3"),
+               call("job4"),
+           ] == dag._job_executor.start_job.call_args_list
+
+
+def test_execute_dag_job_already_exists():
+    job1 = dict(job_name="job1", depends_on=[])
+    job2 = dict(job_name="job2", depends_on=["job1"])
+    job3 = dict(job_name="job3", depends_on=["job1"])
+    job4 = dict(job_name="job4", depends_on=["job2", "job3"])
+    jobs = [job1, job2, job2, job3, job4]
+
+    dag = MetaJobsDag("team", DummyMetaPluginConfiguration())
+    dag.build_dag(jobs)
+    dag._job_executor = MagicMock(spec=TrackingDataJobExecutor)
+    dag._job_executor.get_finished_job_names.side_effect = [
+        ["job1"],
+        ["job2", "job3"],
+        ["job4"],
+    ]
+
+    dag.execute_dag()
+
+    assert [
+               call("job1"),
+               call("job2"),
+               call("job3"),
+               call("job4"),
+           ] == dag._job_executor.start_job.call_args_list
+
+
+def test_execute_dag_wrong_key_type():
+    job1 = dict(job_name="job1", fail_meta_job_on_error=1, depends_on=[])
+    job2 = dict(job_name="job2", depends_on=["job1"])
+    job3 = dict(job_name="job3", depends_on=["job1"])
+    job4 = dict(job_name="job4", depends_on=["job2", "job3"])
+    jobs = [job1, job2, job3, job4]
+
+    dag = MetaJobsDag("team", DummyMetaPluginConfiguration())
+    dag.build_dag(jobs)
+    dag._job_executor = MagicMock(spec=TrackingDataJobExecutor)
+    dag._job_executor.get_finished_job_names.side_effect = [
+        ["job1"],
+        ["job2", "job3"],
+        ["job4"],
+    ]
+
+    dag.execute_dag()
+
+    assert [
+               call("job1"),
+               call("job2"),
+               call("job3"),
+               call("job4"),
+           ] == dag._job_executor.start_job.call_args_list
+
+
+def test_execute_dag_wrong_topological_order():
+    job1 = dict(job_name="job1", depends_on=[])
+    job2 = dict(job_name="job2", depends_on=["job1"])
+    job3 = dict(job_name="job3", depends_on=["job1"])
+    job4 = dict(job_name="job4", depends_on=["job2", "job3"])
+    jobs = [job2, job1, job3, job4]
+
+    dag = MetaJobsDag("team", DummyMetaPluginConfiguration())
+    dag.build_dag(jobs)
+    dag._job_executor = MagicMock(spec=TrackingDataJobExecutor)
+    dag._job_executor.get_finished_job_names.side_effect = [
+        ["job1"],
+        ["job2", "job3"],
+        ["job4"],
+    ]
+
+    dag.execute_dag()
+
+    assert [
+               call("job1"),
+               call("job2"),
+               call("job3"),
+               call("job4"),
+           ] == dag._job_executor.start_job.call_args_list
+
+
+def test_execute_dag_with_not_allowed_keys():
+    job1 = dict(job_name="job1", wrong=1, depends_on=[])
+    job2 = dict(job_name="job2", depends_on=["job1"])
+    job3 = dict(job_name="job3", depends_on=["job1"])
+    job4 = dict(job_name="job4", depends_on=["job2", "job3"])
+    jobs = [job1, job2, job3, job4]
+
+    dag = MetaJobsDag("team", DummyMetaPluginConfiguration())
+    dag.build_dag(jobs)
+    dag._job_executor = MagicMock(spec=TrackingDataJobExecutor)
+    dag._job_executor.get_finished_job_names.side_effect = [
+        ["job1"],
+        ["job2", "job3"],
+        ["job4"],
+    ]
+
+    dag.execute_dag()
+
+    assert [
+               call("job1"),
+               call("job2"),
+               call("job3"),
+               call("job4"),
+           ] == dag._job_executor.start_job.call_args_list
