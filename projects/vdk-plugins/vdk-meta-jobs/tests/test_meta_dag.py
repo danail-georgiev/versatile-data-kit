@@ -192,7 +192,7 @@ def test_execute_dag_wrong_topological_order():
 
 
 def test_execute_dag_with_not_allowed_keys():
-    job1 = dict(job_name="job1", wrong=1, depends_on=[])
+    job1 = dict(job_name="job1", depend_on=[])
     job2 = dict(job_name="job2", depends_on=["job1"])
     job3 = dict(job_name="job3", depends_on=["job1"])
     job4 = dict(job_name="job4", depends_on=["job2", "job3"])
