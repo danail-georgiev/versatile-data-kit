@@ -10,6 +10,8 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Observable } from 'rxjs';
 import { authCodeFlowConfig } from './auth';
 
+import { AppConfigService } from '@versatiledatakit/shared';
+
 @Injectable()
 export class AuthorizationInterceptor implements HttpInterceptor {
     constructor(
@@ -24,6 +26,16 @@ export class AuthorizationInterceptor implements HttpInterceptor {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const url = req.url.toLowerCase();
+        console.error(req.url);
+
+        if (req.url == 'assets/config.json') {
+            return next.handle(req);
+        }
+
+        if (!AppConfigService.config.cspAuthEnabled) {
+            return next.handle(req);
+        }
+
         if (!this.moduleConfig) {
             return next.handle(req);
         }

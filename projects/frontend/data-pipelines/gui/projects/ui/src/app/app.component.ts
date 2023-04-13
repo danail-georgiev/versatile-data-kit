@@ -13,6 +13,8 @@ import { NavigationService } from '@versatiledatakit/shared';
 
 import { authCodeFlowConfig, refreshTokenConfig } from './auth';
 
+import { AppConfigService } from '@versatiledatakit/shared';
+
 const REFRESH_TOKEN_START = 500;
 const ORG_LINK_ROOT = '/csp/gateway/am/api/orgs/';
 const CONSOLE_CLOUD_URL = 'https://console-stg.cloud.vmware.com/';
@@ -40,6 +42,10 @@ export class AppComponent implements OnInit {
 
     logout(): void {
         this.oauthService.logOut();
+    }
+
+    get cspAuthDisabled(): boolean {
+        return !AppConfigService.config.cspAuthEnabled;
     }
 
     get idToken(): string {

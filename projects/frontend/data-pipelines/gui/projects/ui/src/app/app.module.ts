@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpClientModule, HttpBackend } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -17,7 +17,13 @@ import { ApolloModule } from 'apollo-angular';
 
 import { ClarityModule } from '@clr/angular';
 
-import { VdkSharedCoreModule, VdkSharedFeaturesModule, VdkSharedNgRxModule, VdkSharedComponentsModule } from '@versatiledatakit/shared';
+import {
+    AppConfigService,
+    VdkSharedCoreModule,
+    VdkSharedFeaturesModule,
+    VdkSharedNgRxModule,
+    VdkSharedComponentsModule
+} from '@versatiledatakit/shared';
 
 import { VdkDataPipelinesModule } from '@versatiledatakit/data-pipelines';
 
@@ -79,6 +85,12 @@ export function lottiePlayerLoader() {
         {
             provide: AuthConfig,
             useValue: authCodeFlowConfig
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (appConfigService: AppConfigService) => () => appConfigService.loadConfig('assets/config.json'),
+            deps: [AppConfigService],
+            multi: true
         },
         {
             provide: HTTP_INTERCEPTORS,
