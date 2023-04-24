@@ -40,6 +40,7 @@ export class DataJobExecutionStatusFilterComponent implements ClrDatagridFilterI
         return this.selectedStatuses.indexOf(item.status) > -1;
     }
 
+    // testing pre-commit installations
     toggleCheckbox($event: Event) {
         const checkbox = $event.target as HTMLInputElement;
 
