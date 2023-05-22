@@ -36,18 +36,17 @@ public class DataJobEphemeralStorageIT extends BaseIT {
       String jobName, String teamName, String username, String deploymentId) throws Exception {
     // manually start job execution
     ImmutablePair<String, String> executeDataJobResult =
-        JobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId, mockMvc);
+        jobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId);
     String opId = executeDataJobResult.getLeft();
     String executionId = executeDataJobResult.getRight();
 
     // Check the data job execution status
-    JobExecutionUtil.checkDataJobExecutionStatus(
+    jobExecutionUtil.checkDataJobExecutionStatus(
         executionId,
         DataJobExecution.StatusEnum.SUCCEEDED,
         opId,
         jobName,
         teamName,
-        username,
-        mockMvc);
+        username);
   }
 }

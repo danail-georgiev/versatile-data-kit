@@ -62,6 +62,8 @@ public class BaseIT {
 
   @Autowired protected MockMvc mockMvc;
 
+  @Autowired protected JobExecutionUtil jobExecutionUtil;
+
   @Autowired private WebApplicationContext context;
 
   @Value("${integrationTest.dataJobsNamespace:}")

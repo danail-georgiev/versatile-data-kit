@@ -35,7 +35,7 @@ public class DataJobCancellationIT extends BaseIT {
       String jobName, String username, String deploymentId, String teamName) throws Exception {
     // manually start job execution
     ImmutablePair<String, String> executeDataJobResult =
-        JobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId, mockMvc);
+        jobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId);
     String executionId = executeDataJobResult.getRight();
 
     // cancel running execution

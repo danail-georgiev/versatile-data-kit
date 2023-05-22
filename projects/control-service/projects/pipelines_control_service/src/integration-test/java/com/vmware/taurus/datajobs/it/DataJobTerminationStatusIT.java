@@ -81,19 +81,18 @@ public class DataJobTerminationStatusIT extends BaseIT {
       String jobName, String teamName, String username, String deploymentId) throws Exception {
     // manually start job execution
     ImmutablePair<String, String> executeDataJobResult =
-        JobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId, mockMvc);
+        jobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId);
     String opId = executeDataJobResult.getLeft();
     String executionId = executeDataJobResult.getRight();
 
     // Check the data job execution status
-    JobExecutionUtil.checkDataJobExecutionStatus(
+    jobExecutionUtil.checkDataJobExecutionStatus(
         executionId,
         DataJobExecution.StatusEnum.SUCCEEDED,
         opId,
         jobName,
         teamName,
-        username,
-        mockMvc);
+        username);
 
     // Wait for the job execution to complete, polling every 5 seconds
     // See: https://github.com/awaitility/awaitility/wiki/Usage
@@ -135,14 +134,13 @@ public class DataJobTerminationStatusIT extends BaseIT {
             + match.get());
 
     // Check the data job execution status
-    JobExecutionUtil.checkDataJobExecutionStatus(
+    jobExecutionUtil.checkDataJobExecutionStatus(
         executionId,
         DataJobExecution.StatusEnum.SUCCEEDED,
         opId,
         jobName,
         teamName,
-        username,
-        mockMvc);
+        username);
   }
 
   private String scrapeMetrics() throws Exception {

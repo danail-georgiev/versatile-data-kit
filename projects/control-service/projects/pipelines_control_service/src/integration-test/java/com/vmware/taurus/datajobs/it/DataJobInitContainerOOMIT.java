@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import static com.vmware.taurus.datajobs.it.common.JobExecutionUtil.*;
 
 @Slf4j
 @TestPropertySource(
@@ -42,34 +41,31 @@ public class DataJobInitContainerOOMIT extends BaseIT {
       String jobName, String teamName, String username, String deploymentId) throws Exception {
     // manually start job execution
     ImmutablePair<String, String> executeDataJobResult =
-        JobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId, mockMvc);
+        jobExecutionUtil.executeDataJob(jobName, teamName, username, deploymentId);
     String opId = executeDataJobResult.getLeft();
     String executionId = executeDataJobResult.getRight();
 
     // Check the data job execution status
-    testDataJobExecutionRead(
+    jobExecutionUtil.testDataJobExecutionRead(
         executionId,
         DataJobExecution.StatusEnum.PLATFORM_ERROR,
         opId,
         jobName,
         teamName,
-        username,
-        mockMvc);
-    testDataJobExecutionList(
+        username);
+    jobExecutionUtil.testDataJobExecutionList(
         executionId,
         DataJobExecution.StatusEnum.PLATFORM_ERROR,
         opId,
         jobName,
         teamName,
-        username,
-        mockMvc);
-    testDataJobDeploymentExecutionList(
+        username);
+    jobExecutionUtil.testDataJobDeploymentExecutionList(
         executionId,
         DataJobExecution.StatusEnum.PLATFORM_ERROR,
         opId,
         jobName,
         teamName,
-        username,
-        mockMvc);
+        username);
   }
 }
