@@ -9,7 +9,6 @@ import com.vmware.taurus.ControlplaneApplication;
 import com.vmware.taurus.controlplane.model.data.DataJobExecution;
 import com.vmware.taurus.datajobs.it.common.BaseIT;
 import com.vmware.taurus.datajobs.it.common.DataJobDeploymentExtension;
-import com.vmware.taurus.datajobs.it.common.JobExecutionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -36,11 +35,6 @@ public class DataJobMainContainerOOMIT extends BaseIT {
 
     // Check the data job execution status
     jobExecutionUtil.checkDataJobExecutionStatus(
-        executionId,
-        DataJobExecution.StatusEnum.USER_ERROR,
-        opId,
-        jobName,
-        teamName,
-        username);
+        executionId, DataJobExecution.StatusEnum.USER_ERROR, opId, jobName, teamName, username);
   }
 }

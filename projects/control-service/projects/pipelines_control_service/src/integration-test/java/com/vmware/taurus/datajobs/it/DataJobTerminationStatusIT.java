@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import com.vmware.taurus.ControlplaneApplication;
 import com.vmware.taurus.datajobs.it.common.BaseIT;
 import com.vmware.taurus.datajobs.it.common.DataJobDeploymentExtension;
-import com.vmware.taurus.datajobs.it.common.JobExecutionUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -87,12 +86,7 @@ public class DataJobTerminationStatusIT extends BaseIT {
 
     // Check the data job execution status
     jobExecutionUtil.checkDataJobExecutionStatus(
-        executionId,
-        DataJobExecution.StatusEnum.SUCCEEDED,
-        opId,
-        jobName,
-        teamName,
-        username);
+        executionId, DataJobExecution.StatusEnum.SUCCEEDED, opId, jobName, teamName, username);
 
     // Wait for the job execution to complete, polling every 5 seconds
     // See: https://github.com/awaitility/awaitility/wiki/Usage
@@ -135,12 +129,7 @@ public class DataJobTerminationStatusIT extends BaseIT {
 
     // Check the data job execution status
     jobExecutionUtil.checkDataJobExecutionStatus(
-        executionId,
-        DataJobExecution.StatusEnum.SUCCEEDED,
-        opId,
-        jobName,
-        teamName,
-        username);
+        executionId, DataJobExecution.StatusEnum.SUCCEEDED, opId, jobName, teamName, username);
   }
 
   private String scrapeMetrics() throws Exception {
