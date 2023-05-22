@@ -10,7 +10,6 @@ import com.vmware.taurus.controlplane.model.data.DataJobExecution;
 import com.vmware.taurus.datajobs.it.common.BaseIT;
 import com.vmware.taurus.datajobs.it.common.DataJobDeploymentExtension;
 import com.vmware.taurus.datajobs.it.common.DockerConfigJsonUtils;
-import com.vmware.taurus.datajobs.it.common.JobExecutionUtil;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1SecretBuilder;
@@ -91,11 +90,6 @@ public class PrivateBuilderDockerRepoIT extends BaseIT {
 
     // Check the data job execution status
     jobExecutionUtil.checkDataJobExecutionStatus(
-        executionId,
-        DataJobExecution.StatusEnum.SUCCEEDED,
-        opId,
-        jobName,
-        teamName,
-        username);
+        executionId, DataJobExecution.StatusEnum.SUCCEEDED, opId, jobName, teamName, username);
   }
 }

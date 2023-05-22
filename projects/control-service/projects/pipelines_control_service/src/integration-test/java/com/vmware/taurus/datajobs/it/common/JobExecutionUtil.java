@@ -105,10 +105,8 @@ public class JobExecutionUtil {
       throws Exception {
 
     try {
-      testDataJobExecutionRead(
-          executionId, executionStatus, opId, jobName, teamName, username);
-      testDataJobExecutionList(
-          executionId, executionStatus, opId, jobName, teamName, username);
+      testDataJobExecutionRead(executionId, executionStatus, opId, jobName, teamName, username);
+      testDataJobExecutionList(executionId, executionStatus, opId, jobName, teamName, username);
       testDataJobDeploymentExecutionList(
           executionId, executionStatus, opId, jobName, teamName, username);
       testDataJobExecutionLogs(executionId, jobName, teamName, username);
@@ -128,8 +126,7 @@ public class JobExecutionUtil {
   }
 
   public ImmutablePair<String, String> executeDataJob(
-      String jobName, String teamName, String username, String deploymentId)
-      throws Exception {
+      String jobName, String teamName, String username, String deploymentId) throws Exception {
     String opId = jobName + UUID.randomUUID().toString().toLowerCase();
 
     String triggerDataJobExecutionUrl =
@@ -279,16 +276,13 @@ public class JobExecutionUtil {
   }
 
   private void testDataJobExecutionLogs(
-      String executionId, String jobName, String teamName, String username)
-      throws Exception {
-    MvcResult dataJobExecutionLogsResult =
-        getExecuteLogs(executionId, jobName, teamName, username);
+      String executionId, String jobName, String teamName, String username) throws Exception {
+    MvcResult dataJobExecutionLogsResult = getExecuteLogs(executionId, jobName, teamName, username);
     assertFalse(dataJobExecutionLogsResult.getResponse().getContentAsString().isEmpty());
   }
 
   private MvcResult getExecuteLogs(
-      String executionId, String jobName, String teamName, String username)
-      throws Exception {
+      String executionId, String jobName, String teamName, String username) throws Exception {
     String dataJobExecutionListUrl =
         String.format(
             "/data-jobs/for-team/%s/jobs/%s/executions/%s/logs", teamName, jobName, executionId);
