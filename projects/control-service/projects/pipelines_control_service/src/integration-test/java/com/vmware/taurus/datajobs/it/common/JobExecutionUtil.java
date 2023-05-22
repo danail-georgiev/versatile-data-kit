@@ -25,7 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Component
 public class JobExecutionUtil {
 
   public static final String JOB_NAME_PREFIX = "it";
@@ -45,6 +48,8 @@ public class JobExecutionUtil {
   private static final ObjectMapper objectMapper =
       new ObjectMapper()
           .registerModule(new JavaTimeModule()); // Used for converting to OffsetDateTime;
+
+  @Autowired MockMvc mockMvc;
 
   private static final Logger log = LoggerFactory.getLogger(JobExecutionUtil.class);
 
@@ -90,29 +95,28 @@ public class JobExecutionUtil {
     return jobExecutionRepository.save(jobExecution);
   }
 
-  public static void checkDataJobExecutionStatus(
+  public void checkDataJobExecutionStatus(
       String executionId,
       com.vmware.taurus.controlplane.model.data.DataJobExecution.StatusEnum executionStatus,
       String opId,
       String jobName,
       String teamName,
-      String username,
-      MockMvc mockMvc)
+      String username)
       throws Exception {
 
     try {
       testDataJobExecutionRead(
-          executionId, executionStatus, opId, jobName, teamName, username, mockMvc);
+          executionId, executionStatus, opId, jobName, teamName, username);
       testDataJobExecutionList(
-          executionId, executionStatus, opId, jobName, teamName, username, mockMvc);
+          executionId, executionStatus, opId, jobName, teamName, username);
       testDataJobDeploymentExecutionList(
-          executionId, executionStatus, opId, jobName, teamName, username, mockMvc);
-      testDataJobExecutionLogs(executionId, jobName, teamName, username, mockMvc);
+          executionId, executionStatus, opId, jobName, teamName, username);
+      testDataJobExecutionLogs(executionId, jobName, teamName, username);
     } catch (Error e) {
       try {
         // print logs in case execution has failed
         MvcResult dataJobExecutionLogsResult =
-            getExecuteLogs(executionId, jobName, teamName, username, mockMvc);
+            getExecuteLogs(executionId, jobName, teamName, username);
         log.info(
             "Job Execution {} logs:\n{}",
             executionId,
@@ -123,8 +127,8 @@ public class JobExecutionUtil {
     }
   }
 
-  public static ImmutablePair<String, String> executeDataJob(
-      String jobName, String teamName, String username, String deploymentId, MockMvc mockMvc)
+  public ImmutablePair<String, String> executeDataJob(
+      String jobName, String teamName, String username, String deploymentId)
       throws Exception {
     String opId = jobName + UUID.randomUUID().toString().toLowerCase();
 
@@ -151,14 +155,13 @@ public class JobExecutionUtil {
     return ImmutablePair.of(opId, executionId);
   }
 
-  public static void testDataJobExecutionRead(
+  public void testDataJobExecutionRead(
       String executionId,
       com.vmware.taurus.controlplane.model.data.DataJobExecution.StatusEnum executionStatus,
       String opId,
       String jobName,
       String teamName,
-      String username,
-      MockMvc mockMvc) {
+      String username) {
 
     com.vmware.taurus.controlplane.model.data.DataJobExecution[] dataJobExecution =
         new com.vmware.taurus.controlplane.model.data.DataJobExecution[1];
@@ -199,14 +202,13 @@ public class JobExecutionUtil {
         executionId, executionStatus, opId, dataJobExecution[0], jobName, username);
   }
 
-  public static void testDataJobExecutionList(
+  public void testDataJobExecutionList(
       String executionId,
       com.vmware.taurus.controlplane.model.data.DataJobExecution.StatusEnum executionStatus,
       String opId,
       String jobName,
       String teamName,
-      String username,
-      MockMvc mockMvc)
+      String username)
       throws Exception {
 
     String dataJobExecutionListUrl =
@@ -233,14 +235,13 @@ public class JobExecutionUtil {
         executionId, executionStatus, opId, dataJobExecutions.get(0), jobName, username);
   }
 
-  public static void testDataJobDeploymentExecutionList(
+  public void testDataJobDeploymentExecutionList(
       String executionId,
       com.vmware.taurus.controlplane.model.data.DataJobExecution.StatusEnum executionStatus,
       String opId,
       String jobName,
       String teamName,
-      String username,
-      MockMvc mockMvc)
+      String username)
       throws Exception {
 
     String dataJobDeploymentExecutionListUrl =
@@ -277,16 +278,16 @@ public class JobExecutionUtil {
         UUID.randomUUID().toString().substring(0, 8));
   }
 
-  private static void testDataJobExecutionLogs(
-      String executionId, String jobName, String teamName, String username, MockMvc mockMvc)
+  private void testDataJobExecutionLogs(
+      String executionId, String jobName, String teamName, String username)
       throws Exception {
     MvcResult dataJobExecutionLogsResult =
-        getExecuteLogs(executionId, jobName, teamName, username, mockMvc);
+        getExecuteLogs(executionId, jobName, teamName, username);
     assertFalse(dataJobExecutionLogsResult.getResponse().getContentAsString().isEmpty());
   }
 
-  private static MvcResult getExecuteLogs(
-      String executionId, String jobName, String teamName, String username, MockMvc mockMvc)
+  private MvcResult getExecuteLogs(
+      String executionId, String jobName, String teamName, String username)
       throws Exception {
     String dataJobExecutionListUrl =
         String.format(
