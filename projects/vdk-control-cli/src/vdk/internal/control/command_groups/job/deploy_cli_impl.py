@@ -13,10 +13,10 @@ from taurus_datajob_api import DataJobConfig
 from taurus_datajob_api import DataJobContacts
 from taurus_datajob_api import DataJobDeployment
 from taurus_datajob_api import DataJobSchedule
+from vdk.internal.builtin_plugins.config.job_config import JobConfig
 from vdk.internal.control.configuration.defaults_config import load_default_team_name
 from vdk.internal.control.exception.vdk_exception import VDKException
 from vdk.internal.control.job.job_archive import JobArchive
-from vdk.internal.control.job.job_config import JobConfig
 from vdk.internal.control.rest_lib.factory import ApiClientFactory
 from vdk.internal.control.rest_lib.rest_client_errors import ApiClientErrorDecorator
 from vdk.internal.control.utils import output_printer

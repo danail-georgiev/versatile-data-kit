@@ -4,8 +4,8 @@ import configparser
 import os
 
 import pytest
+from vdk.internal.builtin_plugins.config.job_config import JobConfig
 from vdk.internal.control.exception.vdk_exception import VDKException
-from vdk.internal.control.job.job_config import JobConfig
 from vdk.internal.control.utils import cli_utils
 from vdk.internal.test_utils import find_test_resource
 
