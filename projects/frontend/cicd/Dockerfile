@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 ENV NVM_VERSION=0.39.3
 ENV NODE_VERSION=18.12.0
 ENV NPM_VERSION=9.7.2
-ENV ANGULAR_CLI_VERSION=13.3.11
+ENV ANGULAR_CLI_VERSION=13.3.7
 ENV CYPRESS_VERSION=12.16.0
 
 # Install nvm for managing nodejs and install nodejs
