@@ -12,7 +12,7 @@ from vdk.internal.control.command_groups.job.delete import JobDelete
 from vdk.internal.control.command_groups.job.deploy_cli_impl import JobDeploy
 from vdk.internal.control.command_groups.job.download_job import JobDownloadSource
 from vdk.internal.control.utils import cli_utils
-from vdk_jupyterlab_extension.transform_job import TransformJobDirectoryProcessor
+from vdk_jupyterlab_extension.convert_job import ConvertJobDirectoryProcessor
 
 
 class RestApiUrlConfiguration:
@@ -225,14 +225,14 @@ class VdkUI:
             return vdk_cells
 
     @staticmethod
-    def transform_job(job_dir: str):
+    def convert_job(job_dir: str):
         """
         Transforms the job in the specified directory by archiving it, processing the Python and SQL files,
         and returning a processed code structure.
         :param job_dir: Path to the directory of the job to be transformed.
         :return: The processed code structure.
         """
-        processor = TransformJobDirectoryProcessor(Path(job_dir))
+        processor = ConvertJobDirectoryProcessor(Path(job_dir))
         processor.process_files()
         message = {
             "code_structure": processor.get_code_structure(),

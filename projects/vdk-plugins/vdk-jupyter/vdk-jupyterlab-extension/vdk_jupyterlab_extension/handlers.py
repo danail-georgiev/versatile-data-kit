@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import logging
+import os
 
 import tornado
 from jupyter_server.base.handlers import APIHandler
@@ -111,7 +112,7 @@ class DownloadJobHandler(APIHandler):
             self.finish(json.dumps({"message": f"{e}", "error": "true"}))
 
 
-class TransformJobHandler(APIHandler):
+class ConvertJobHandler(APIHandler):
     """
     Class responsible for handling POST request for transforming a directory type Data job(with .py and .sql files)
     to a notebook type data job
@@ -121,7 +122,7 @@ class TransformJobHandler(APIHandler):
     def post(self):
         input_data = self.get_json_body()
         try:
-            message = json.dumps(VdkUI.transform_job(input_data[VdkOption.PATH.value]))
+            message = json.dumps(VdkUI.convert_job(input_data[VdkOption.PATH.value]))
             self.finish(json.dumps({"message": f"{message}", "error": ""}))
         except Exception as e:
             self.finish(json.dumps({"message": f"{e}", "error": "true"}))
@@ -216,7 +217,7 @@ def setup_handlers(web_app):
     add_handler(RunJobHandler, "run")
     add_handler(DeleteJobHandler, "delete")
     add_handler(DownloadJobHandler, "download")
-    add_handler(TransformJobHandler, "convertJobToNotebook")
+    add_handler(ConvertJobHandler, "convertJobToNotebook")
     add_handler(CreateJobHandler, "create")
     add_handler(LoadJobDataHandler, "job")
     add_handler(CreateDeploymentHandler, "deploy")

@@ -5,10 +5,10 @@ import shutil
 import tempfile
 import unittest
 
-from vdk_jupyterlab_extension.transform_job import TransformJobDirectoryProcessor
+from vdk_jupyterlab_extension.convert_job import ConvertJobDirectoryProcessor
 
 
-class TestTransformJobDirectoryProcessor(unittest.TestCase):
+class TestConvertJobDirectoryProcessor(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         self.sql_content = "SELECT * FROM table"
@@ -30,7 +30,7 @@ class TestTransformJobDirectoryProcessor(unittest.TestCase):
         with open(os.path.join(self.temp_dir, "config.ini"), "w") as f:
             pass
 
-        self.processor = TransformJobDirectoryProcessor(self.temp_dir)
+        self.processor = ConvertJobDirectoryProcessor(self.temp_dir)
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
