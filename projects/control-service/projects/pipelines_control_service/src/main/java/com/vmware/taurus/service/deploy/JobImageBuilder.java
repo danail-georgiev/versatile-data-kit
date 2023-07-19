@@ -165,8 +165,11 @@ public class JobImageBuilder {
       }
     }
 
-    ecrRegistryInterface.createRepository(ecrRegistryInterface.extractImageRepositoryTag(dockerRepositoryUrl) + "/" + dataJob.getName(),
-            awsCredentialsService.createTemporaryCredentials());
+    ecrRegistryInterface.createRepository(
+        ecrRegistryInterface.extractImageRepositoryTag(dockerRepositoryUrl)
+            + "/"
+            + dataJob.getName(),
+        awsCredentialsService.createTemporaryCredentials());
 
     var args =
         Arrays.asList(

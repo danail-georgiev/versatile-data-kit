@@ -55,9 +55,10 @@ public class DeploymentNotificationHelper {
             sendNotification);
       } else {
         if (logs.contains("error resolving source context: reference not found")) {
-          log.error("Job Builder image failed to clone the git repository: " +
-                  "double check the git configuration including git url, credentials and branch." +
-                  "If this not not the root cause. See next error message");
+          log.error(
+              "Job Builder image failed to clone the git repository: "
+                  + "double check the git configuration including git url, credentials and branch."
+                  + "If this not not the root cause. See next error message");
         }
 
         ErrorMessage message =
@@ -104,9 +105,9 @@ public class DeploymentNotificationHelper {
   private String getDataJobNotFoundError(String logs, JobDeployment jobDeployment) {
     String error = null;
 
-    if (StringUtils.isNotBlank(logs) &&
-            (logs.contains(">data-job-not-found<") || logs.contains("failed to get files used from context"))
-            ) {
+    if (StringUtils.isNotBlank(logs)
+        && (logs.contains(">data-job-not-found<")
+            || logs.contains("failed to get files used from context"))) {
       error =
           NotificationContent.getErrorBody(
               "Tried to deploy a data job and failed.",
