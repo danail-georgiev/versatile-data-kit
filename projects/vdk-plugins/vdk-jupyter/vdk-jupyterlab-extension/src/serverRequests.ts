@@ -99,7 +99,8 @@ export async function jobRequest(endPoint: string): Promise<void> {
  * - message: A string that includes the 'codeStructure' and 'filenames' os the steps of the transformed job.
  * - status: A boolean indicating the operation's success. It's '' when no errors occurred during the operation.
  *
- * Upon failure (either server-side or client-side), the function returns an object with an error message and 'false' status.
+ * Upon failure (either server-side or client-side), the function returns an object
+ * with an error message and 'false' status.
  * Any error that occurred during the operation is also shown to the user.
  *
  * @returns A Promise that resolves to an object containing the message from the server and the status of the operation.
@@ -217,5 +218,14 @@ export async function getServerDirRequest(): Promise<string> {
   const data = await requestAPI<any>('serverPath', {
     method: 'GET'
   });
-  return data;
+  if (data) {
+    return data;
+  } else {
+    await showErrorMessage(
+      "Encountered an error while trying to connect the server. Error: \
+      the server's location cannot be identified!",
+      [Dialog.okButton()]
+    );
+    return '';
+  }
 }

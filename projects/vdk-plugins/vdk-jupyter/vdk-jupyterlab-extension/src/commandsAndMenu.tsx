@@ -16,7 +16,8 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 var runningVdkOperation = false;
 
-export function updateVDKMenu(commands: CommandRegistry, docManager: IDocumentManager, fileBrowser: FileBrowser, notebookTracker: INotebookTracker) {
+export function updateVDKMenu(commands: CommandRegistry, docManager: IDocumentManager,
+  fileBrowser: FileBrowser, notebookTracker: INotebookTracker): void {
   // Add Run job command
   add_command(commands, 'jp-vdk:menu-run', 'Run', 'Execute VDK Run Command', showRunJobDialog, docManager);
 

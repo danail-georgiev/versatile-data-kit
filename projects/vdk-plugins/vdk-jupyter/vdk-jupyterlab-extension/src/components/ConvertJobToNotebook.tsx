@@ -4,20 +4,19 @@ import { VdkOption } from '../vdkOptions/vdk_options';
 import VDKTextInput from './VdkTextInput';
 import { Dialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
 import { getServerDirRequest, jobConvertToNotebookRequest } from '../serverRequests';
-import { IJobPathProp } from './props';
 import { VdkErrorMessage } from './VdkErrorMessage';
 import { CONVERT_JOB_TO_NOTEBOOK_BUTTON_LABEL } from '../utils';
 import { CommandRegistry } from '@lumino/commands';
 import { FileBrowser } from '@jupyterlab/filebrowser';
 import { INotebookTracker } from '@jupyterlab/notebook';
-import { JupyterCellProps } from './props';
+import {  IJobPathProp, JupyterCellProps } from './props';
 
 
 
 /**
  * A class responsible for the Transform Job operation
  * for more information check:
- * https://github.com/vmware/versatile-data-kit/wiki/VDK-Jupyter-Integration-Transform-Job-Operation
+ * https://github.com/vmware/versatile-data-kit/wiki/VDK-Jupyter-Integration-Convert-Job-Operation
  */
 export default class ConvertJobToNotebookDialog extends Component<IJobPathProp> {
   /**
@@ -47,7 +46,8 @@ export default class ConvertJobToNotebookDialog extends Component<IJobPathProp> 
   }
 }
 
-export async function showConvertJobToNotebookDialog(commands: CommandRegistry, fileBrowser: FileBrowser, notebookTracker: INotebookTracker) {
+export async function showConvertJobToNotebookDialog(commands: CommandRegistry,
+  fileBrowser: FileBrowser, notebookTracker: INotebookTracker): Promise<void> {
   const result = await showDialog({
     title: CONVERT_JOB_TO_NOTEBOOK_BUTTON_LABEL,
     body: (
@@ -73,7 +73,7 @@ export async function showConvertJobToNotebookDialog(commands: CommandRegistry, 
       if (status) {
         const transformjobResult = JSON.parse(message);
         const notebookContent = initializeNotebookContent(transformjobResult["code_structure"], transformjobResult["removed_files"])
-        createTranformedNotebook(notebookContent, commands, fileBrowser, notebookTracker);
+        await createTranformedNotebook(notebookContent, commands, fileBrowser, notebookTracker);
         await showDialog({
           title: CONVERT_JOB_TO_NOTEBOOK_BUTTON_LABEL,
           body: (
@@ -120,13 +120,15 @@ export async function showConvertJobToNotebookDialog(commands: CommandRegistry, 
  * @param {FileBrowser} fileBrowser - The file browser to navigate the file system.
  * @param {INotebookTracker} notebookTracker - The notebook tracker to track changes to the notebook.
  */
-const createTranformedNotebook = async (notebookContent: JupyterCellProps[], commands: CommandRegistry, fileBrowser: FileBrowser, notebookTracker: INotebookTracker) => {
+const createTranformedNotebook = async (notebookContent: JupyterCellProps[],
+  commands: CommandRegistry, fileBrowser: FileBrowser, notebookTracker: INotebookTracker) => {
   try {
     const baseDir = await getServerDirRequest();
-    jobData.set(VdkOption.NAME, jobData.get(VdkOption.PATH)!.split(/[\\/]/).pop() || ""); //get the name of the job using the directory
+    jobData.set(VdkOption.NAME,
+      jobData.get(VdkOption.PATH)!.split(/[\\/]/).pop() || ""); //get the name of the job using the directory
     await fileBrowser.model.cd(jobData.get(VdkOption.PATH)!.substring(baseDir.length));  // relative path for Jupyter
     commands.execute('notebook:create-new');
-    populateNotebook(notebookContent, notebookTracker);
+    await populateNotebook(notebookContent, notebookTracker);
   }
   catch (error) {
     await showErrorMessage(
@@ -149,7 +151,7 @@ const createTranformedNotebook = async (notebookContent: JupyterCellProps[], com
  * @return {JupyterCellProps[]} - The structured content ready to be used to populate a notebook.
  */
 const initializeNotebookContent = (codeStructure: string[], fileNames: string[]): JupyterCellProps[] => {
-  let notebookContent: JupyterCellProps[] = [];
+  const notebookContent: JupyterCellProps[] = [];
 
   for (let i = 0; i < codeStructure.length; i++) {
     notebookContent.push({
@@ -191,7 +193,7 @@ const populateNotebook = async (notebookContent: JupyterCellProps[], notebookTra
         cells.clear(); // clear the initial empty cell
 
         const addMarkdownCell = (source: string[]) => {
-          let markdownCell = notebookPanel.content.model?.contentFactory?.createMarkdownCell({
+          const markdownCell = notebookPanel.content.model?.contentFactory?.createMarkdownCell({
             cell: {
               cell_type: 'markdown',
               source: source,
@@ -202,7 +204,7 @@ const populateNotebook = async (notebookContent: JupyterCellProps[], notebookTra
         }
 
         const addCodeCell = (source: string[], metadata: {}) => {
-          let codeCell = notebookPanel.content.model?.contentFactory?.createCodeCell({
+          const codeCell = notebookPanel.content.model?.contentFactory?.createCodeCell({
             cell: {
               cell_type: 'code',
               source: source,
@@ -273,7 +275,7 @@ const populateNotebook = async (notebookContent: JupyterCellProps[], notebookTra
         ], {})
 
         // add code that came from the previous version of the job and the names of the files where they came from
-        for (let cellProps of notebookContent) {
+        for (const cellProps of notebookContent) {
           if (cellProps.type === 'markdown') {
             addMarkdownCell([cellProps.source])
           } else if (cellProps.type === 'code') {
